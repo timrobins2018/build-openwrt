@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: Build OpenWrt
+name: Build OpenWrt matrix
 
 on:
   repository_dispatch:
@@ -37,8 +37,21 @@ env:
   TZ: Asia/Shanghai
 
 jobs:
+  getmatrix:
+    runs-on: ubuntu-latest
+    steps:
+      - id: get-matrix-fromURL
+        run: echo "config_matrix=$(curl ${{ github.event.inputs.configURL }})" >> $GITHUB_OUTPUT
+    outputs:
+      config_matrix: ${{ steps.get-matrix-fromURL.outputs.config_matrix }}
+
   build:
+    needs: getmatrix
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJson(needs.getmatrix.outputs.config_matrix) }}
 
     steps:
       - name: Checkout
@@ -62,7 +75,7 @@ jobs:
       - name: Get Config file
         working-directory: /workdir
         run: |
-          wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
+          wget ${{ matrix.config }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
