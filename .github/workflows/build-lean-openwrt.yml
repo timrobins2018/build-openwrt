@@ -35,6 +35,7 @@ env:
   UPLOAD_OSHI: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
+  ZIPNAME: openwrt-lean.zip
 
 jobs:
   build:
