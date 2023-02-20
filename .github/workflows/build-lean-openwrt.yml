@@ -71,7 +71,7 @@ jobs:
         run: |
           df -hT $PWD
           echo "git clone $REPO_URL -b v${{ env.DESTVER }} openwrt"
-          git clone $REPO_URL -b v${{ env.DESTVER }} openwrt
+          git clone $REPO_URL -b ${{ env.DESTVER }} openwrt
           ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: Load custom feeds
