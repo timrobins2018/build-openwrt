@@ -124,7 +124,7 @@ jobs:
         run: |
           cd openwrt
           cp .config ${{ env.TARGET }}.config
-          sed -i "1i # DESTVER=${{ env.TARGET }}" ${{ env.TARGET }}.config
+          sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
           curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee oshi.log
           echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
