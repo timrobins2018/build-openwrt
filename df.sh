@@ -3,5 +3,5 @@
 while true
 do
     df -h
-    sleep 15
+    sleep 60
 done
