@@ -31,10 +31,10 @@ env:
   DF_SH: df.sh
   CORRECT_VERMAGIC: correct-vermagic.sh
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: false
-  UPLOAD_WETRANSFER: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_WETRANSFER: true
   UPLOAD_OSHI: true
-  UPLOAD_RELEASE: false
+  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
