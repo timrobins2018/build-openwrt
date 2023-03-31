@@ -34,6 +34,7 @@ env:
   UPLOAD_FIRMWARE: false
   UPLOAD_WETRANSFER: false
   UPLOAD_OSHI: true
+  UPLOAD_TRANSFER: true  
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
@@ -190,13 +191,22 @@ jobs:
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
           echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
 
+      - name: Upload firmware to transfer.sh
+        id: transfer
+        if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
+        run: |
+          echo ${{ env.FIRMWARE }}
+          cd ${{ env.FIRMWARE }}
+          zip -r ${{ env.ZIPNAME }} .
+          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} | transfer.log
+          echo "url=$(cat transfer.log | head -n 3 | tail -n 1)" >> $GITHUB_OUTPUT
+
       - name: Upload firmware to Oshi
         id: Oshi
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_OSHI == 'true' && !cancelled()
         run: |
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
-          zip -r ${{ env.ZIPNAME }} .
           #curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -F autodestroy=3 | tee oshi.log
           curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720  | tee oshi.log
           echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
