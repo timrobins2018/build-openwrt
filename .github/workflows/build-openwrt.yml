@@ -198,7 +198,7 @@ jobs:
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
-          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} | transfer.log
+          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} | tee transfer.log
           echo "url=$(cat transfer.log | head -n 3 | tail -n 1)" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to Oshi
