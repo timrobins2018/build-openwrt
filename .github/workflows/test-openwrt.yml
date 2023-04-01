@@ -198,11 +198,9 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
-          logfile=${{ env.FIRMWARE }}/transfer.log
+          logfile=/tmp/transfer.log
           echo ${{ env.FIRMWARE }}
-          pwd
           cd ${{ env.FIRMWARE }}
-          pwd
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
