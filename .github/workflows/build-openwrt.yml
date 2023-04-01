@@ -208,7 +208,8 @@ jobs:
           cat url.log
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
           ls -l
-	  ls -l /tmp
+          ls -l /tmp
+
 
       - name: Upload firmware to Oshi
         id: Oshi
