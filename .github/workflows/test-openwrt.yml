@@ -205,6 +205,9 @@ jobs:
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
+          cat $logfile
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+          cat url.log
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to Oshi
