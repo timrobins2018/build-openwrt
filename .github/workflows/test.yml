@@ -70,6 +70,8 @@ jobs:
         run: |
           cd /workdir/openwrt
           pwd
+          ls /workdir
+          whoami
           dd if=/dev/zero of=test.img bs=1M count=5
 
 
