@@ -198,7 +198,7 @@ jobs:
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
-          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
+          $GITHUB_WORKSPACE/$FUNCS_SH progress ${{ env.FIRMWARE }}/transfer.log &
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>transfer.log
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
 
@@ -209,7 +209,7 @@ jobs:
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           #curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -F autodestroy=3 | tee oshi.log
-          $GITHUB_WORKSPACE/$FUNCS_SH progress oshi.log &
+          $GITHUB_WORKSPACE/$FUNCS_SH progress ${{ env.FIRMWARE }}/oshi.log &
           curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -o url.log 2>oshi.log
           echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
 
