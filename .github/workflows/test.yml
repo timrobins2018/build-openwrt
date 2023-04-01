@@ -72,7 +72,7 @@ jobs:
           pwd
           ls -l /workdir
           whoami
-          dd if=/dev/zero of=test.img bs=1M count=5
+          sudo dd if=/dev/zero of=test.img bs=1M count=5
 
 
       - name: Upload firmware to transfer.sh
