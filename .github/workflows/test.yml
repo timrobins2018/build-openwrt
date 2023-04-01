@@ -77,7 +77,6 @@ jobs:
 
       - name: Upload firmware to transfer.sh
         id: transfer
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
           cd /workdir/openwrt
           logfile=/home/runner/work/build-openwrt/build-openwrt/openwrt/bin/targets/x86/64/transfer.log
