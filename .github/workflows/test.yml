@@ -18,9 +18,6 @@ on:
         description: "SSH connection to Actions"
         required: false
         default: "false"
-      configURL:
-        description: "please input configURL"
-        required: true
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt.git
