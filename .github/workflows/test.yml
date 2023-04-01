@@ -69,7 +69,7 @@ jobs:
         id: compile
         run: |
           cd /workdir/openwrt
-          # mkdir -p bin/targets/x86/64
+          pwd
           dd if=/dev/zero of=test.img bs=1M count=5
 
 
