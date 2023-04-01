@@ -48,7 +48,8 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get install tmate
-          sudo mkdir -p /workdir/openwrt
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
           ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: Load custom feeds
@@ -68,21 +69,19 @@ jobs:
       - name: Compile the firmware
         id: compile
         run: |
-          cd /workdir/openwrt
-          pwd
+          cd /workdir
           ls -l /workdir
-          whoami
-          sudo dd if=/dev/zero of=test.img bs=1M count=5
+          dd if=/dev/zero of=test.img bs=1M count=5
           ls -l `pwd`
 
 
       - name: Upload firmware to transfer.sh
         id: transfer
         run: |
-          cd /workdir/openwrt
+          cd /workdir
           logfile=transfer.log
-          sudo $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
-          sudo curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>transfer.log
+          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
+          curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>transfer.log
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
