@@ -48,7 +48,8 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get install tmate
-          sudo mkdir -p /workdir
+          sudo mkdir -p /workdir/openwrt
+          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: Load custom feeds
         run: |
