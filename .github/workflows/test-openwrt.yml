@@ -198,14 +198,14 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
-          logfile=/tmp/transfer.log
+          logfile=/home/runner/work/build-openwrt/build-openwrt/openwrt/bin/targets/x86/64/transfer.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           # zip -r ${{ env.ZIPNAME }} .
           mv test.img ${{ env.ZIPNAME }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          echo "curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>>$logfile"
-          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>>/tmp/transfer.log
+          # echo "curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>>$logfile"
+          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>>transfer.log
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
