@@ -195,13 +195,20 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
-          logfile=${{ env.FIRMWARE }}/transfer.log
+          logfile=/tmp/transfer.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
+          ps aux|grep funcs.sh
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+          cat $logfile
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+          cat url.log
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
+          ls -l
+	  ls -l /tmp
 
       - name: Upload firmware to Oshi
         id: Oshi
