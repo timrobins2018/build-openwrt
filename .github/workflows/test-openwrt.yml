@@ -204,7 +204,7 @@ jobs:
           # zip -r ${{ env.ZIPNAME }} .
           mv test.img ${{ env.ZIPNAME }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
+          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>>$logfile
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
