@@ -206,6 +206,7 @@ jobs:
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           ps aux|grep funcs.sh
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
