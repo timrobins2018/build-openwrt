@@ -79,11 +79,11 @@ jobs:
         id: transfer
         run: |
           cd /workdir
-          logfile=transfer.log
-          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
+          logfile=/tmp/transfer.log
+          $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           ps aux|grep funcs.sh
           ls -l
-          curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>transfer.log
+          curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>$logfile
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
