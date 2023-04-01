@@ -201,7 +201,11 @@ jobs:
           logfile=/tmp/transfer.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
+          ls -l 
+          echo "------------------------------------------------------"
           zip -r ${{ env.ZIPNAME }} .
+          echo "------------------------------------------------------"
+          ls -l
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
           cat $logfile
