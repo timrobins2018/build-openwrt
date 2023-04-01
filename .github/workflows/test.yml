@@ -81,7 +81,7 @@ jobs:
         run: |
           cd /workdir/openwrt
           logfile=transfer.log
-          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
+          sudo $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
           sudo curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>transfer.log
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
