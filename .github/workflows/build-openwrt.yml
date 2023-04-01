@@ -28,7 +28,7 @@ env:
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
-  DF_SH: df.sh
+  FUNCS_SH: funcs.sh
   CORRECT_VERMAGIC: correct-vermagic.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: false
@@ -94,7 +94,7 @@ jobs:
       - name: Load custom feeds
         run: |
           [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-          chmod +x $DIY_P1_SH $DF_SH
+          chmod +x $DIY_P1_SH $FUNCS_SH
           cd openwrt
           $GITHUB_WORKSPACE/$DIY_P1_SH
 
@@ -145,7 +145,7 @@ jobs:
           curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee oshi.log
           echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
-          $GITHUB_WORKSPACE/$DF_SH &
+          $GITHUB_WORKSPACE/$FUNCS_SH df &
           make -j$(nproc) || make -j1 || make -j1 V=s
           echo "status=success" >> $GITHUB_OUTPUT
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
@@ -198,8 +198,9 @@ jobs:
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
-          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} | tee transfer.log
-          echo "url=$(cat transfer.log | head -n 3 | tail -n 1)" >> $GITHUB_OUTPUT
+          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
+          curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>transfer.log
+          echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to Oshi
         id: Oshi
@@ -208,8 +209,9 @@ jobs:
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           #curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -F autodestroy=3 | tee oshi.log
-          curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720  | tee oshi.log
-          echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
+          $GITHUB_WORKSPACE/$FUNCS_SH progress oshi.log &
+          curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -o url.log 2>oshi.log
+          echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
 
       - name: Generate release tag
         id: tag
