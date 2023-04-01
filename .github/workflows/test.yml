@@ -68,7 +68,7 @@ jobs:
       - name: Compile the firmware
         id: compile
         run: |
-          cd openwrt
+          cd /workdir/openwrt
           # mkdir -p bin/targets/x86/64
           dd if=/dev/zero of=test.img bs=1M count=5
 
@@ -77,6 +77,7 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
+          cd /workdir/openwrt
           logfile=/home/runner/work/build-openwrt/build-openwrt/openwrt/bin/targets/x86/64/transfer.log
           mv test.img ${{ env.ZIPNAME }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
