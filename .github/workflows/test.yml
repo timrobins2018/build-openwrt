@@ -73,15 +73,15 @@ jobs:
           ls -l /workdir
           whoami
           sudo dd if=/dev/zero of=test.img bs=1M count=5
+          ls -l `pwd`
 
 
       - name: Upload firmware to transfer.sh
         id: transfer
         run: |
           cd /workdir/openwrt
-          logfile=/home/runner/work/build-openwrt/build-openwrt/openwrt/bin/targets/x86/64/transfer.log
-          mv test.img ${{ env.ZIPNAME }}
-          $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
+          logfile=transfer.log
+          $GITHUB_WORKSPACE/$FUNCS_SH progress transfer.log &
           curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>>transfer.log
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
