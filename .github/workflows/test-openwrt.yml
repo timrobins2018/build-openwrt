@@ -203,7 +203,8 @@ jobs:
           cd ${{ env.FIRMWARE }}
           ls -l 
           echo "------------------------------------------------------"
-          zip -r ${{ env.ZIPNAME }} .
+          # zip -r ${{ env.ZIPNAME }} .
+          mv test.img ${{ env.ZIPNAME }}
           echo "------------------------------------------------------"
           ls -l
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
