@@ -20,7 +20,7 @@ function progress() {
     while true
     do
         if [ -f $1 ];then
-            if [ "_debut" ];then
+            if [ "_debut" == "true" ];then
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
                 _debut=false
             fi
