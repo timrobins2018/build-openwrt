@@ -207,9 +207,8 @@ jobs:
           ps aux|grep funcs.sh
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          cat $logfile
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
           ls -l
 

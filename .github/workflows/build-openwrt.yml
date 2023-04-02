@@ -196,16 +196,14 @@ jobs:
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
           logfile=/tmp/transfer.log
-          echo ${{ env.FIRMWARE }}
+          # echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          ps aux|grep funcs.sh
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          cat $logfile
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
           ls -l
           ls -l /tmp
@@ -215,7 +213,7 @@ jobs:
         id: Oshi
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_OSHI == 'true' && !cancelled()
         run: |
-          logfile=${{ env.FIRMWARE }}/oshi.log
+          logfile=/tmp/oshi.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
