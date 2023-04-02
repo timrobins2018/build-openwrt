@@ -22,6 +22,7 @@ function progress() {
         echo $_debut
         if [ -f $1 ];then
             if [ "$_debut" == "true" ];then
+                echo bingo
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
                 _debut=false
             fi
