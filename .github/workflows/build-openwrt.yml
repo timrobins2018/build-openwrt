@@ -34,7 +34,7 @@ env:
   UPLOAD_FIRMWARE: false
   UPLOAD_WETRANSFER: false
   UPLOAD_OSHI: true
-  UPLOAD_TRANSFER: true  
+  UPLOAD_TRANSFER: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
@@ -52,7 +52,7 @@ jobs:
           # this might remove tools that are actually needed,
           # if set to "true" but frees about 6 GB
           tool-cache: true
-          
+
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
@@ -201,13 +201,7 @@ jobs:
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          cat url.log
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
-          ls -l
-          ls -l /tmp
-
+          echo "url=$(cat url.log)"
 
       - name: Upload firmware to Oshi
         id: Oshi
@@ -218,7 +212,7 @@ jobs:
           cd ${{ env.FIRMWARE }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -o url.log 2>$logfile
-          echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
+          echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)"
 
       - name: Generate release tag
         id: tag
