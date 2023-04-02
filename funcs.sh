@@ -18,18 +18,18 @@ function progress() {
     local _debut
     _debut=true
     while true
-    do  
+    do
         if [ -f $1 ];then
+            _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
+            sleep 5
             if [ "$_debut" == "true" ];then
                 echo "==========================================================="
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
                 echo "==========================================================="
                 _debut=false
             fi
-            _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
+            cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
         fi
-        sleep 5
-        cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
     done
 }
 
