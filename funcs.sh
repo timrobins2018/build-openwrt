@@ -16,19 +16,21 @@ function diskfree() {
 function progress() {
     local _pct
     local _debut
+    local _rowcnt
     _debut=true
     while true
     do
         if [ -f $1 ];then
             _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
-            sleep 5
-            if [ "$_debut" == "true" ];then
-                echo "==========================================================="
+            _rowcnd=$(cat $1 |wc -l)
+            if [ "$_debut" == "true" -a "$_rowcnd" -ge "3" ];then
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
-                echo "==========================================================="
                 _debut=false
             fi
-            cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
+            sleep 5
+            if [ "$_debut" == "false" ];then
+                cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
+            fi
         fi
     done
 }

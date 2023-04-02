@@ -86,7 +86,7 @@ jobs:
           # echo "test=bingo" >> $GITHUB_OUTPUT
           echo "url=$(cat url.log)"
           echo "---------------------------------------------------"
-          cat $logfile
+          # cat $logfile
           # ls -l
 
       - name: Delete workflow runs
