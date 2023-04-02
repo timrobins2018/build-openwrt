@@ -19,7 +19,6 @@ function progress() {
     _debut=true
     while true
     do  
-        echo $_debut
         if [ -f $1 ];then
             if [ "$_debut" == "true" ];then
                 echo bingo
