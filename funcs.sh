@@ -23,12 +23,11 @@ function progress() {
         if [ -f $1 ];then
             _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
             _rowcnt=$(cat $1 |tr '\r' '\n'|wc -l)
-            echo $_rowcnt
             if [ "$_debut" == "true" -a "$_rowcnt" -ge "3" ];then
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
                 _debut=false
             fi
-            sleep 5
+            sleep 1
             if [ "$_debut" == "false" ];then
                 cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
             fi
