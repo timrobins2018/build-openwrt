@@ -21,8 +21,9 @@ function progress() {
     do  
         if [ -f $1 ];then
             if [ "$_debut" == "true" ];then
-                echo bingo
-                cat $1  2>/dev/null |tr '\r' '\n' | head -n 3 | awk '{print $0}'
+                echo "==========================================================="
+                cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
+                echo "==========================================================="
                 _debut=false
             fi
             _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
