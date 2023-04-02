@@ -84,13 +84,13 @@ jobs:
           ps aux|grep funcs.sh
           ls -l
           curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>$logfile
-          cat $logfile
+          # cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
-          echo .
+          echo 
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          echo "test=bingo" >> $GITHUB_OUTPUT
-          echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
+          # echo "test=bingo" >> $GITHUB_OUTPUT
+          echo "url=$(cat url.log)"
           echo "---------------------------------------------------"
           ls -l
 
