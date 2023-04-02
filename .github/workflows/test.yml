@@ -87,6 +87,7 @@ jobs:
           cat $logfile
           echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           cat url.log
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           echo "url=$(cat url.log)" >> $GITHUB_OUTPUT
           ls -l
 
