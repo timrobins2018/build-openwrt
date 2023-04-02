@@ -81,14 +81,8 @@ jobs:
           cd /workdir
           logfile=/tmp/transfer.log
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          ps aux|grep funcs.sh
           ls -l
           curl --upload-file test.img https://transfer.sh/test.img -o url.log 2>$logfile
-          # cat $logfile
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
-          cat url.log
-          echo 
-          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           # echo "test=bingo" >> $GITHUB_OUTPUT
           echo "url=$(cat url.log)"
           echo "---------------------------------------------------"
