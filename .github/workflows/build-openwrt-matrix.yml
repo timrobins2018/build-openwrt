@@ -208,24 +208,24 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_TRANSFER == 'true' && !cancelled()
         run: |
-          logfile=${{ env.FIRMWARE }}/transfer.log
+          logfile=/tmp/transfer.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }} 
           zip -r ${{ env.ZIPNAME }} . 
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &    
           curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o url.log 2>$logfile
-          echo "url=$(cat url.log)" >> $GITHUB_OUTPUT          
+          echo "url=$(cat url.log)"
 
       - name: Upload firmware to Oshi
         id: Oshi
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_OSHI == 'true' && !cancelled()
         run: |
-          logfile=${{ env.FIRMWARE }}/oshi.log
+          logfile=/tmp/oshi.log
           echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           curl https://oshi.at -F f=@${{ env.ZIPNAME }} -F shorturl=0 -F expire=720 -o url.log 2>$logfile
-          echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
+          echo "url=$(cat url.log | grep DL: | cut -d : -f 2-3)"
 
       - name: Generate release tag
         id: tag
