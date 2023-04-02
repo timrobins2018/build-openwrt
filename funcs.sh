@@ -15,17 +15,19 @@ function diskfree() {
 
 function progress() {
     local _pct
-    # rm -f $1
+    local _debut
+    _debut=true
     while true
     do
         if [ -f $1 ];then
-            _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
-            if [ "_pct" == "0" ];then
-                cat $1  2>/dev/null |tr '\r' '\n' | head -n 4  
+            if [ "_debut" ];then
+                cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
+                _debut=false
             fi
+            _pct=$(cat $1  |tr '\r' '\n' | tail -n 1 |awk '{print $1}')
         fi
         sleep 5
-        cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}' 
+        cat $1  2>/dev/null |tr '\r' '\n' | tail -n 1 |awk '{if ($1 > '${_pct:-0}') print $0}'
     done
 }
 
