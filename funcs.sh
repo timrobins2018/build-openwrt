@@ -18,7 +18,8 @@ function progress() {
     local _debut
     _debut=true
     while true
-    do
+    do  
+        echo $_debut
         if [ -f $1 ];then
             if [ "$_debut" == "true" ];then
                 cat $1  2>/dev/null |tr '\r' '\n' | head -n 3
