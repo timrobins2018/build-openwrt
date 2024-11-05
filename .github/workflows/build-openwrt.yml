@@ -146,7 +146,7 @@ jobs:
           curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee oshi.log
           echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
-          $GITHUB_WORKSPACE/$FUNCS_SH df &
+          # $GITHUB_WORKSPACE/$FUNCS_SH df &
           echo $(nproc)
           # make -j$(nproc) || make -j1 || make -j1 V=s
           make -j2
