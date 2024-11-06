@@ -21,7 +21,7 @@ on:
       configURL:
         description: "please input configURL"
         required: true
-        default: "false"
+        default: "https://oshi.at/bBUv/x64.config"
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt.git
