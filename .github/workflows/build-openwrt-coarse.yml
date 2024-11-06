@@ -134,12 +134,12 @@ jobs:
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
-      # - name: Correct vermagic
-      #   id: vermagic
-      #   run: |
-      #     chmod +x $CORRECT_VERMAGIC
-      #     cd openwrt
-      #     $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
+      - name: Correct vermagic
+        id: vermagic
+        run: |
+          chmod +x $CORRECT_VERMAGIC
+          cd openwrt
+          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
 
       - name: Compile the firmware
         id: compile
