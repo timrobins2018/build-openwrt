@@ -77,12 +77,12 @@ jobs:
           sudo sed -i "1i alias next='touch /tmp/continue'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
-      - name: Get Config file
-        working-directory: /workdir
-        run: |
-          wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
-          ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
-          echo "DESTVER=$ver" >> $GITHUB_ENV
+      # - name: Get Config file
+      #   working-directory: /workdir
+      #   run: |
+      #     wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
+      #     ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
+      #     echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
         working-directory: /workdir
