@@ -20,7 +20,8 @@ on:
         default: "false"
       configURL:
         description: "please input configURL"
-        required: true
+        required: false
+        default: "false"
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt.git
