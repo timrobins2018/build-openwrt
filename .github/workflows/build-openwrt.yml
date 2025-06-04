@@ -82,6 +82,10 @@ jobs:
         run: |
           wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
+          if [ -z "$ver" ]; then
+            echo "ERROR: 未在配置文件中找到 DESTVER 字段" >&2
+            exit 1
+          fi
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
