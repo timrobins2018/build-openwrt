@@ -74,6 +74,7 @@ jobs:
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
           sudo sed -i "1i alias next='touch /tmp/continue'" /etc/profile
+          sudo sed -i "1i alias ll='ls -la'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
       - name: Get Config file
@@ -117,11 +118,17 @@ jobs:
           $GITHUB_WORKSPACE/$DIY_P2_SH
           cp -f /workdir/$CONFIG_FILE $CONFIG_FILE
 
+      # - name: SSH connection to Actions
+      #   if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     limit-access-to-actor: true
       - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
         if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
+        env:
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}      
 
       - name: Download package
         id: package
@@ -144,10 +151,12 @@ jobs:
         timeout-minutes: 360
         run: |
           cd openwrt
+          logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
           sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
-          curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee oshi.log
-          echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT
+          # curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee $logfile
+          curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
+          echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
           # $GITHUB_WORKSPACE/$FUNCS_SH df &
           echo $(nproc)
@@ -197,7 +206,7 @@ jobs:
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
           echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
 
-      - name: Upload firmware to bashupload.com
+      - name: Upload firmware to bashupload
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_BASHUPLOAD == 'true' && !cancelled()
         run: |
