@@ -205,7 +205,7 @@ jobs:
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_BASHUPLOAD == 'true' && !cancelled()
         run: |
-          logfile=/tmp/transfer.log
+          logfile=transfer.log
           urllog=url.log
           # echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
