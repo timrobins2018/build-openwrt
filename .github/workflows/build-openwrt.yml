@@ -89,8 +89,8 @@ jobs:
           sudo sed -i "1i alias ll='ls -la'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
-          echo $PATH >> $GITHUB_ENV
-          which git >> $GITHUB_ENV
+          echo $PATH 
+          which git 
 
       - name: Get Config file
         working-directory: /workdir
