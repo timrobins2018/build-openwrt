@@ -234,7 +234,7 @@ jobs:
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
           # curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o $urllog 2>$logfile
           curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }} -o $urllog 2>$logfile
-          echo "url=$(cat $urllog | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
+          echo "url=$(cat $urllog | grep wget | cut -f 2)"
 
       - name: Generate release tag
         id: tag
