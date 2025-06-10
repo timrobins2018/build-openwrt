@@ -167,7 +167,8 @@ jobs:
           logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
           sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
-          # curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee $logfile
+          dl1=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
+          echo "dl1=$dl1" >> $GITHUB_OUTPUT
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
