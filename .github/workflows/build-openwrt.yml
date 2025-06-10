@@ -162,7 +162,7 @@ jobs:
         id: compile
         timeout-minutes: 360
         run: |
-          set -e
+          set +e
           cd openwrt
           logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
@@ -174,7 +174,12 @@ jobs:
           # $GITHUB_WORKSPACE/$FUNCS_SH df &
           echo $(nproc)
           # 先尝试多线程编译，失败则单线程重试
-          make -j$(nproc) || make -j1 V=s
+          make -j$(nproc)
+          status=$?
+          if [ $status -ne 0 ]; then
+            make -j1 V=s
+            status=$?
+          fi
           echo "status=success" >> $GITHUB_OUTPUT
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
