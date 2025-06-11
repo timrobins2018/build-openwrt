@@ -241,7 +241,7 @@ jobs:
           # curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o $urllog 2>$logfile
           curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }} -o $urllog 2>$logfile
           echo "curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }}"
-          echo "url=$(cat $urllog | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
+          echo "url=$(cat $urllog | grep wget | cut -f 2)" |tee -a $GITHUB_OUTPUT
 
       - name: Generate release tag
         id: tag
@@ -251,6 +251,7 @@ jobs:
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch release.txt
           [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+          [ $UPLOAD_BASHUPLOAD = true ] && echo "🔗 [BashUpload](${{ steps.transfer.outputs.url }})" >> release.txt
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to release
