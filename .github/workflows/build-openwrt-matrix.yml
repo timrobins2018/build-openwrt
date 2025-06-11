@@ -107,6 +107,10 @@ jobs:
         run: |
           wget ${{ matrix.config }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
+          if [ -z "$ver" ]; then
+            echo "ERROR: 未在配置文件中找到 DESTVER 字段" >&2
+            exit 1
+          fi
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
@@ -149,6 +153,7 @@ jobs:
       - name: Download package
         id: package
         run: |
+          set -e
           cd openwrt
           make defconfig
           make download -j8
@@ -158,6 +163,7 @@ jobs:
       - name: Correct vermagic
         id: vermagic
         run: |
+          set -e
           chmod +x $CORRECT_VERMAGIC
           cd openwrt
           $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
@@ -166,14 +172,25 @@ jobs:
         id: compile
         timeout-minutes: 360
         run: |
+          set +e
           cd openwrt
+          logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
           sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
-          curl https://oshi.at -F f=@${{ env.TARGET }}.config -F shorturl=0 | tee oshi.log
-          echo "url=$(cat oshi.log | grep DL: | cut -d : -f 2-3)" >> $GITHUB_OUTPUT          
+          dl1=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
+          echo "dl1=$dl1" >> $GITHUB_OUTPUT
+          curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
+          echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
-          $GITHUB_WORKSPACE/$FUNCS_SH df &
-          make -j$(nproc) || make -j1 || make -j1 V=s
+          # $GITHUB_WORKSPACE/$FUNCS_SH df &
+          echo $(nproc)
+          # 先尝试多线程编译，失败则单线程重试
+          make -j$(nproc)
+          status=$?
+          if [ $status -ne 0 ]; then
+            make -j1 V=s
+            status=$?
+          fi
           echo "status=success" >> $GITHUB_OUTPUT
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
@@ -194,6 +211,7 @@ jobs:
         id: organize
         if: ${{ !cancelled() }}
         run: |
+          set -e
           cd openwrt/bin/targets/*/*
           rm -rf packages
           echo ${{ env.TARGET }}
@@ -213,6 +231,7 @@ jobs:
         id: wetransfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
         run: |
+          set -e
           curl -fsSL git.io/file-transfer | sh
           ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
           echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
@@ -238,9 +257,11 @@ jobs:
         id: tag
         if: env.UPLOAD_RELEASE == 'true' && !cancelled()
         run: |
+          set -e
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch release.txt
           [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
+          [ $UPLOAD_BASHUPLOAD = true ] && echo "🔗 [BashUpload](${{ steps.transfer.outputs.url }})" >> release.txt
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to release
