@@ -170,7 +170,7 @@ jobs:
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
           # $GITHUB_WORKSPACE/$FUNCS_SH df &
-          echo $(nproc)
+          make prepare
           # 先尝试多线程编译，失败则单线程重试
           make -j$(nproc)
           status=$?
