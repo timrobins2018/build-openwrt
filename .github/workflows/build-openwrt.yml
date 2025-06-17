@@ -169,7 +169,7 @@ jobs:
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
-          # $GITHUB_WORKSPACE/$FUNCS_SH df &
+          $GITHUB_WORKSPACE/$FUNCS_SH df &
           # 先尝试多线程编译，失败则单线程重试
           make -j$(nproc)
           status=$?
