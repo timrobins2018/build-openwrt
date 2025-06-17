@@ -174,6 +174,7 @@ jobs:
           make -j$(nproc)
           status=$?
           if [ $status -ne 0 ]; then
+            echo -e "\033[31m多线程编译失败,尝试单线程编译\033[0m"
             make -j1 V=s
             status=$?
           fi
