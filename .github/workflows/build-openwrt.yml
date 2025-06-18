@@ -205,7 +205,7 @@ jobs:
           chmod +x $CORRECT_VERMAGIC
           cd openwrt
           # $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
-          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $GITHUB_WORKSPACE/$CONFIG_FILE
+          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $GITHUB_WORKSPACE/openwrt/$CONFIG_FILE
 
       - name: Compile the firmware
         id: compile
