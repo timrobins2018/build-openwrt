@@ -129,14 +129,15 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
+          # sudo mkdir -p /workdir
+          # sudo chown $USER:$GROUPS /workdir
           sudo sed -i "1i alias next='touch /tmp/continue'" /etc/profile
           sudo sed -i "1i alias ll='ls -la'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
       - name: Get Config file
-        working-directory: /workdir
+        # working-directory: /workdir
+        working-directory: $GITHUB_WORKSPACE
         run: |
           wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
@@ -147,12 +148,13 @@ jobs:
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
-        working-directory: /workdir
+        # working-directory: /workdir
+        working-directory: $GITHUB_WORKSPACE
         run: |
           df -hT $PWD
           echo "git clone $REPO_URL -b v${{ env.DESTVER }} openwrt"
           git clone $REPO_URL -b v${{ env.DESTVER }} openwrt
-          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+          # ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: Load custom feeds
         run: |
@@ -174,7 +176,7 @@ jobs:
           chmod +x $DIY_P2_SH
           cd openwrt
           $GITHUB_WORKSPACE/$DIY_P2_SH
-          cp -f /workdir/$CONFIG_FILE $CONFIG_FILE
+          # cp -f /workdir/$CONFIG_FILE $CONFIG_FILE
 
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
