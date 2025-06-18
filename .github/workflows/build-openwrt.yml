@@ -137,7 +137,9 @@ jobs:
 
       - name: Get Config file
         # working-directory: /workdir
-        working-directory: $GITHUB_WORKSPACE
+
+        # 默认就是${{ github.workspace }},可不写
+        # working-directory: ${{ github.workspace }}
         run: |
           wget ${{ github.event.inputs.configURL }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
@@ -149,7 +151,7 @@ jobs:
 
       - name: Clone source code
         # working-directory: /workdir
-        working-directory: $GITHUB_WORKSPACE
+        # working-directory: $GITHUB_WORKSPACE
         run: |
           df -hT $PWD
           echo "git clone $REPO_URL -b v${{ env.DESTVER }} openwrt"
