@@ -136,8 +136,6 @@ jobs:
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
       - name: Get Config file
-        # working-directory: /workdir
-
         # 默认就是${{ github.workspace }},可不写
         # working-directory: ${{ github.workspace }}
         run: |
@@ -150,13 +148,10 @@ jobs:
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
-        # working-directory: /workdir
-        # working-directory: $GITHUB_WORKSPACE
         run: |
           df -hT $PWD
           echo "git clone $REPO_URL -b v${{ env.DESTVER }} openwrt"
           git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt
-          # ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: Load custom feeds
         run: |
@@ -178,7 +173,6 @@ jobs:
           chmod +x $DIY_P2_SH
           cd openwrt
           $GITHUB_WORKSPACE/$DIY_P2_SH
-          # cp -f /workdir/$CONFIG_FILE $CONFIG_FILE
 
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
@@ -203,7 +197,6 @@ jobs:
           set -e
           chmod +x $CORRECT_VERMAGIC
           cd openwrt
-          # $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
           $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $GITHUB_WORKSPACE/$CONFIG_FILE
 
       - name: Compile the firmware
@@ -215,13 +208,14 @@ jobs:
           logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
           sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
-          dl1=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
-          echo "dl1=$dl1" >> $GITHUB_OUTPUT
+          dl=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
+          echo "dl=$dl" >> $GITHUB_OUTPUT
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
-          echo -e "$(nproc) thread compile"
+          
           $GITHUB_WORKSPACE/$FUNCS_SH df &
-          # 先尝试多线程编译，失败则单线程重试
+          
+          echo -e "$(nproc) thread compile"
           make -j$(nproc)
           status=$?
           if [ $status -ne 0 ]; then
