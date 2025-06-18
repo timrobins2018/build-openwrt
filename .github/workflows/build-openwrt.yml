@@ -32,7 +32,6 @@ env:
   CORRECT_VERMAGIC: correct-vermagic.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
-  UPLOAD_WETRANSFER: true
   UPLOAD_BASHUPLOAD: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
@@ -272,16 +271,6 @@ jobs:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}          
 
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-        run: |
-          set -e
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
-
       - name: Upload firmware to bashupload
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_BASHUPLOAD == 'true' && !cancelled()
@@ -293,7 +282,6 @@ jobs:
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          # curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o $urllog 2>$logfile
           curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }} -o $urllog 2>$logfile
           echo "curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }}"
           echo "url=$(cat $urllog | grep wget | cut -f 2)" |tee -a $GITHUB_OUTPUT
@@ -305,7 +293,6 @@ jobs:
           set -e
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch release.txt
-          [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
           [ $UPLOAD_BASHUPLOAD = true ] && echo "🔗 [BashUpload](${{ steps.transfer.outputs.url }})" >> release.txt
           echo "status=success" >> $GITHUB_OUTPUT
 
