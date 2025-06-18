@@ -131,6 +131,7 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           # sudo mkdir -p /workdir
           # sudo chown $USER:$GROUPS /workdir
+          sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
           sudo sed -i "1i alias next='touch /tmp/continue'" /etc/profile
           sudo sed -i "1i alias ll='ls -la'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
