@@ -175,7 +175,7 @@ jobs:
       - name: Load custom configuration
         run: |
           [ -e files ] && mv files openwrt/files
-          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+          [ -e $CONFIG_FILE ] && cp $CONFIG_FILE openwrt/.config
           chmod +x $DIY_P2_SH
           cd openwrt
           $GITHUB_WORKSPACE/$DIY_P2_SH
@@ -205,7 +205,7 @@ jobs:
           chmod +x $CORRECT_VERMAGIC
           cd openwrt
           # $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
-          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $GITHUB_WORKSPACE/openwrt/$CONFIG_FILE
+          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $CONFIG_FILE
 
       - name: Compile the firmware
         id: compile
