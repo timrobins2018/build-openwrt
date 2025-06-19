@@ -32,8 +32,7 @@ env:
   CORRECT_VERMAGIC: correct-vermagic.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
-  UPLOAD_WETRANSFER: true
-  UPLOAD_BASHUPLOAD: true
+  UPLOAD_BASHUPLOAD: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
@@ -55,9 +54,6 @@ jobs:
         config: ${{ fromJson(needs.getmatrix.outputs.config_matrix) }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@main
-
       - name: Check Server Performance
         run: |
           echo "警告⚠"
@@ -93,21 +89,6 @@ jobs:
           npm_clean: "True"
           os_swap: "True"
 
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: true
-          
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          swap-storage: true
-
       - name: Freeing up disk space
         uses: easimon/maximize-build-space@master
         with: 
@@ -117,39 +98,35 @@ jobs:
           remove-android: 'true'
           remove-haskell: 'true'
           remove-codeql: 'true'
-          remove-docker-images: 'true'           
+          remove-docker-images: 'true'
+
+      - name: Checkout
+        uses: actions/checkout@main          
 
       - name: Initialization environment
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-          sudo docker image prune --all --force
           sudo -E apt-get -qq update
-          sudo apt full-upgrade -y
-          sudo -E apt-get -qq install libblkid-dev util-linux ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
-          sudo -E apt-get install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
-            bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
-            genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev \
-            libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev \
-            libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf \
-            python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion \
-            swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev libattr1-dev
-          sudo -E apt-get install -y build-essential git binutils bzip2 flex python3 \
-            gettext libncurses5-dev zlib1g-dev gawk bison libprotobuf-dev protobuf-compiler python3-setuptools \
-            libssl-dev make gcc g++ binutils patch gzip cpio subversion git-core libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl unzip mercurial \
-            rsync unzip file libz-dev liblzo2-dev libbz2-dev python3-distutils libcrypto++-dev openssl
+          sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+          bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
+          git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
+          libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
+          mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
+          libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
+          vim wget xmlto xxd zlib1g-dev python3-setuptools
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/local/lib/android /opt/ghc /usr/share/dotnet /usr/local/graalvm /usr/local/.ghcup \
+          /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules
           sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
+
+          sudo chown $USER:$GROUPS $GITHUB_WORKSPACE
           sudo sed -i "1i alias next='touch /tmp/continue'" /etc/profile
           sudo sed -i "1i alias ll='ls -la'" /etc/profile
           sudo bash -c 'cat ~/.bashrc >> /etc/profile'
 
       - name: Get Config file
-        working-directory: /workdir
         run: |
           wget ${{ matrix.config }} -O $CONFIG_FILE
           ver=$(grep 'DESTVER=' $CONFIG_FILE | cut -d = -f 2)
@@ -160,12 +137,10 @@ jobs:
           echo "DESTVER=$ver" >> $GITHUB_ENV
 
       - name: Clone source code
-        working-directory: /workdir
         run: |
           df -hT $PWD
-          echo "git clone $REPO_URL -b v${{ env.DESTVER }} openwrt"
-          git clone $REPO_URL -b v${{ env.DESTVER }} openwrt
-          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+          echo "git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt"
+          git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt
 
       - name: Load custom feeds
         run: |
@@ -183,11 +158,10 @@ jobs:
       - name: Load custom configuration
         run: |
           [ -e files ] && mv files openwrt/files
-          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+          [ -e $CONFIG_FILE ] && cp $CONFIG_FILE openwrt/.config
           chmod +x $DIY_P2_SH
           cd openwrt
           $GITHUB_WORKSPACE/$DIY_P2_SH
-          cp -f /workdir/$CONFIG_FILE $CONFIG_FILE
 
       - name: SSH connection to Actions
         uses: P3TERX/ssh2actions@v1.0.0
@@ -212,7 +186,7 @@ jobs:
           set -e
           chmod +x $CORRECT_VERMAGIC
           cd openwrt
-          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC /workdir/$CONFIG_FILE
+          $GITHUB_WORKSPACE/$CORRECT_VERMAGIC $GITHUB_WORKSPACE/$CONFIG_FILE
 
       - name: Compile the firmware
         id: compile
@@ -223,13 +197,15 @@ jobs:
           logfile=configurl.log
           cp .config ${{ env.TARGET }}.config
           sed -i "1i # DESTVER=${{ env.VER }}" ${{ env.TARGET }}.config
-          dl1=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
-          echo "dl1=$dl1" >> $GITHUB_OUTPUT
+          dl=$(curl -s -F"file=@${{ env.TARGET }}.config" -F"expires=24" https://0x0.st | tee $logfile)
+          echo "dl=$dl" >> $GITHUB_OUTPUT
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
-          echo -e "$(nproc) thread compile"
+
           $GITHUB_WORKSPACE/$FUNCS_SH df &
-          # 先尝试多线程编译，失败则单线程重试
+
+          echo -e "\033[34m $(nproc) thread compile ! \033[0m"
+
           make -j$(nproc)
           status=$?
           if [ $status -ne 0 ]; then
@@ -278,16 +254,6 @@ jobs:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-        run: |
-          set -e
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
-
       - name: Upload firmware to bashupload
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_BASHUPLOAD == 'true' && !cancelled()
@@ -295,13 +261,10 @@ jobs:
           set -e
           logfile=transfer.log
           urllog=url.log
-          # echo ${{ env.FIRMWARE }}
           cd ${{ env.FIRMWARE }}
           zip -r ${{ env.ZIPNAME }} .
           $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &
-          # curl --upload-file ${{ env.ZIPNAME }} https://transfer.sh/${{ env.ZIPNAME }} -o $urllog 2>$logfile
           curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }} -o $urllog 2>$logfile
-          echo "curl https://bashupload.com/${{ env.ZIPNAME }} --data-binary @${{ env.ZIPNAME }}"
           echo "url=$(cat $urllog | grep wget | cut -f 2)" |tee -a $GITHUB_OUTPUT
 
       - name: Generate release tag
@@ -311,7 +274,6 @@ jobs:
           set -e
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch release.txt
-          [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
           [ $UPLOAD_BASHUPLOAD = true ] && echo "🔗 [BashUpload](${{ steps.transfer.outputs.url }})" >> release.txt
           echo "status=success" >> $GITHUB_OUTPUT
 
