@@ -253,6 +253,15 @@ jobs:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
+      - name: Package firmware
+        id: packfile
+        if: steps.organize.outputs.status == 'success' && !cancelled()
+        run: |
+          logfile=/tmp/packfile.log
+          cd ${{ env.FIRMWARE }}
+          zip -r ${{ env.ZIPNAME }} .
+          $GITHUB_WORKSPACE/$FUNCS_SH progress $logfile &          
+
       - name: Upload firmware to bashupload
         id: transfer
         if: steps.organize.outputs.status == 'success' && env.UPLOAD_BASHUPLOAD == 'true' && !cancelled()
