@@ -215,7 +215,7 @@ jobs:
           
           $GITHUB_WORKSPACE/$FUNCS_SH df &
 
-          echo -e "$(nproc) thread compile"
+          echo -e "\033[34m $(nproc) thread compile ! \033[0m"
           make -j$(nproc)
           status=$?
           if [ $status -ne 0 ]; then
