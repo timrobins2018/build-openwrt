@@ -74,7 +74,7 @@ jobs:
           homebrew_clean: "True"
           npm_prune: "True"
           npm_clean: "True"
-          os_swap: "True"        
+          os_swap: "True"
 
       - name: Freeing up disk space
         uses: easimon/maximize-build-space@master
@@ -157,7 +157,7 @@ jobs:
         if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
         env:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}      
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
       - name: Download package
         id: package
@@ -190,7 +190,7 @@ jobs:
           echo "dl=$dl" >> $GITHUB_OUTPUT
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
-          
+
           $GITHUB_WORKSPACE/$FUNCS_SH df &
 
           echo -e "\033[34m $(nproc) thread compile ! \033[0m"
@@ -207,7 +207,6 @@ jobs:
             echo "Compile failed" >&2
             exit 1
           fi
-
           grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
           [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
           echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
@@ -221,7 +220,7 @@ jobs:
         if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
         with:
           name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-          path: openwrt/bin          
+          path: openwrt/bin
 
       - name: Organize files
         id: organize
@@ -241,7 +240,7 @@ jobs:
         if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
         with:
           name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-          path: ${{ env.FIRMWARE }}          
+          path: ${{ env.FIRMWARE }}
 
       - name: Upload firmware to bashupload
         id: transfer
