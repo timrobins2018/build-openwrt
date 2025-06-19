@@ -32,7 +32,7 @@ env:
   CORRECT_VERMAGIC: correct-vermagic.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
-  UPLOAD_BASHUPLOAD: true
+  UPLOAD_BASHUPLOAD: false
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
