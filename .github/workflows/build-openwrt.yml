@@ -21,6 +21,10 @@ on:
       configURL:
         description: "please input configURL"
         required: true
+      diskfree:
+        description: "show disk free space"
+        required: false
+        default: "false"       
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt.git
@@ -191,7 +195,9 @@ jobs:
           curl https://bashupload.com/${{ env.TARGET }}.config --data-binary @${{ env.TARGET }}.config | tee $logfile
           echo "url=$(cat $logfile | grep wget | cut -f 2)" >> $GITHUB_OUTPUT
 
-          $GITHUB_WORKSPACE/$FUNCS_SH df &
+          if ${{ github.event.inputs.diskfree == 'true' }}; then
+            $GITHUB_WORKSPACE/$FUNCS_SH df &
+          fi
 
           echo -e "\033[34m $(nproc) thread compile ! \033[0m"
           make -j$(nproc)
