@@ -90,8 +90,14 @@ jobs:
       - name: Clone source code
         run: |
           df -hT $PWD
-          echo "git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt"
-          git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt
+          if [ -z ${{ env.DESTVER }}];then
+            echo "git clone --depth=1 $REPO_URL -b master openwrt"
+            git clone --depth=1 $REPO_URL -b master openwrt
+          else
+            echo "git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt"
+            git clone --depth=1 $REPO_URL -b v${{ env.DESTVER }} openwrt
+          fi
+
 
       - name: Load custom feeds
         run: |
