@@ -24,7 +24,11 @@ on:
       diskfree:
         description: "show disk free space"
         required: false
-        default: "false"       
+        default: "false"
+      singlethread:
+        description: "use single thread to compile"
+        required: false
+        default: "false"
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt.git
@@ -199,15 +203,22 @@ jobs:
             $GITHUB_WORKSPACE/$FUNCS_SH df &
           fi
 
-          echo -e "\033[34m $(nproc) thread compile ! \033[0m"
-          make -j$(nproc)
-          status=$?
-          if [ $status -ne 0 ]; then
-            echo -e "\033[31m多线程编译失败,尝试单线程编译\033[0m"
+          if ${{ github.event.inputs.singlethread == 'true' }}; then
+            echo -e "\033[34m 单线程编译 ! \033[0m"
             make -j1 V=s
             status=$?
+          else
+            echo -e "\033[34m $(nproc) thread compile ! \033[0m"
+            make -j$(nproc)
+            status=$?
+            if [ $status -ne 0 ]; then
+              echo -e "\033[31m多线程编译失败,尝试单线程编译\033[0m"
+              make -j1 V=s
+              status=$?
+            fi            
           fi
-          if [ $? == 0 ]; then
+
+          if [ $status == 0 ]; then
             echo "status=success" >> $GITHUB_OUTPUT
           else
             echo "Compile failed" >&2
